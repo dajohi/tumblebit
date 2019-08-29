@@ -19,7 +19,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/decred/dcrd/chaincfg"
+	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/tumblebit/puzzle"
 	"github.com/decred/tumblebit/wallet"
 )
@@ -408,7 +408,6 @@ func (tb *Tumbler) sessionTicker(ctx context.Context) error {
 			}
 		}
 	}
-	return g.Wait()
 }
 
 func (tb *Tumbler) deferredActions(ctx context.Context, actions []*deferredAction) error {

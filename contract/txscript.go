@@ -10,23 +10,20 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/decred/dcrd/dcrutil"
-	"github.com/decred/dcrd/txscript"
+	"decred.org/dcrwallet/wallet/txrules"
+	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v3"
 	"github.com/decred/dcrd/wire"
-	"github.com/decred/dcrwallet/wallet/txrules"
 )
+
+const scriptVersion = 0
 
 const feePerKb = 1e5
 
-const verifyFlags = txscript.ScriptBip16 |
-	txscript.ScriptVerifyDERSignatures |
-	txscript.ScriptVerifyStrictEncoding |
-	txscript.ScriptVerifyMinimalData |
-	txscript.ScriptDiscourageUpgradableNops |
+const verifyFlags = txscript.ScriptDiscourageUpgradableNops |
 	txscript.ScriptVerifyCleanStack |
 	txscript.ScriptVerifyCheckLockTimeVerify |
 	txscript.ScriptVerifyCheckSequenceVerify |
-	txscript.ScriptVerifyLowS |
 	txscript.ScriptVerifySHA256
 
 func (con *Contract) AddEscrowScript() error {
@@ -204,7 +201,7 @@ func (con *Contract) BuildRefundTx() error {
 			dcrutil.Amount(tx.TxOut[0].Value))
 	}
 
-	txIn := wire.NewTxIn(&contractOutPoint, nil)
+	txIn := wire.NewTxIn(&contractOutPoint, 0, nil)
 	txIn.Sequence = 0
 	tx.AddTxIn(txIn)
 
@@ -253,7 +250,7 @@ func (con *Contract) VerifyRefundTx() error {
 
 	e, err := txscript.NewEngine(
 		con.EscrowTx.TxOut[contractOutPoint.Index].PkScript,
-		con.RefundTx, 0, verifyFlags, txscript.DefaultScriptVersion,
+		con.RefundTx, 0, verifyFlags, scriptVersion,
 		txscript.NewSigCache(10))
 	if err != nil {
 		return err
@@ -318,7 +315,7 @@ func (con *Contract) BuildRedeemTx(sigScriptAddSize int) error {
 
 	tx := wire.NewMsgTx()
 	tx.LockTime = uint32(con.LockTime)
-	tx.AddTxIn(wire.NewTxIn(&contractOutPoint, nil))
+	tx.AddTxIn(wire.NewTxIn(&contractOutPoint, 0, nil))
 	tx.AddTxOut(wire.NewTxOut(0, outScript)) // amount set below
 	redeemSize := estimateRedeemSerializeSize(con.EscrowScript, tx.TxOut,
 		sigScriptAddSize)
@@ -384,7 +381,7 @@ func (con *Contract) VerifyRedeemTx() error {
 
 	e, err := txscript.NewEngine(
 		con.EscrowTx.TxOut[contractOutPoint.Index].PkScript,
-		con.RedeemTx, 0, verifyFlags, txscript.DefaultScriptVersion,
+		con.RedeemTx, 0, verifyFlags, scriptVersion,
 		txscript.NewSigCache(10))
 	if err != nil {
 		return err

@@ -5,17 +5,21 @@
 
 package cfgutil
 
-import "github.com/decred/dcrd/dcrutil"
+import (
+	"github.com/decred/dcrd/chaincfg/v3"
+	"github.com/decred/dcrd/dcrutil/v3"
+)
 
 // AddressFlag embeds a dcrutil.Address and implements the flags.Marshaler and
 // Unmarshaler interfaces so it can be used as a config struct field.
 type AddressFlag struct {
 	dcrutil.Address
+	chainParams *chaincfg.Params
 }
 
 // NewAddressFlag creates an AddressFlag with a default dcrutil.Address.
-func NewAddressFlag(defaultValue dcrutil.Address) *AddressFlag {
-	return &AddressFlag{defaultValue}
+func NewAddressFlag(defaultValue dcrutil.Address, params *chaincfg.Params) *AddressFlag {
+	return &AddressFlag{defaultValue, params}
 }
 
 // MarshalFlag satisifes the flags.Marshaler interface.
@@ -33,7 +37,7 @@ func (a *AddressFlag) UnmarshalFlag(addr string) error {
 		a.Address = nil
 		return nil
 	}
-	address, err := dcrutil.DecodeAddress(addr)
+	address, err := dcrutil.DecodeAddress(addr, a.chainParams)
 	if err != nil {
 		return err
 	}

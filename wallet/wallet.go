@@ -11,10 +11,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/decred/dcrd/chaincfg"
-	"github.com/decred/dcrd/txscript"
+	pb "decred.org/dcrwallet/rpc/walletrpc"
+	"github.com/decred/dcrd/chaincfg/v3"
+	"github.com/decred/dcrd/txscript/v3"
 	"github.com/decred/dcrd/wire"
-	pb "github.com/decred/dcrwallet/rpc/walletrpc"
 	"github.com/decred/tumblebit/contract"
 
 	"google.golang.org/grpc"
@@ -436,8 +436,7 @@ func (w *Wallet) OfferRedeemer(ctx context.Context, con *contract.Contract) (boo
 		return false, nil, fmt.Errorf("Spender %v", err)
 	}
 
-	if err = con.ParseTransaction(contract.RedeemTransaction,
-		sr.SpenderTransaction); err != nil {
+	if err = con.ParseRedeemTransaction(sr.SpenderTransaction); err != nil {
 		return false, nil, fmt.Errorf("failed to parse redeeming tx: %v",
 			err)
 	}

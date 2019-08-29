@@ -16,8 +16,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/btcsuite/btclog"
-	"github.com/decred/dcrd/dcrutil"
+	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/slog"
 	"github.com/decred/tumblebit/internal/cfgutil"
 	"github.com/decred/tumblebit/netparams"
 	"github.com/decred/tumblebit/tumbler"
@@ -127,7 +127,7 @@ func cleanAndExpandPath(path string) string {
 
 // validLogLevel returns whether or not logLevel is a valid debug log level.
 func validLogLevel(logLevel string) bool {
-	_, ok := btclog.LevelFromString(logLevel)
+	_, ok := slog.LevelFromString(logLevel)
 	return ok
 }
 
@@ -300,7 +300,7 @@ func loadConfig(ctx context.Context) (*config, []string, error) {
 	// Multiple networks can't be selected simultaneously.
 	numNets := 0
 	if cfg.TestNet {
-		activeNet = &netparams.TestNet2Params
+		activeNet = &netparams.TestNet3Params
 		numNets++
 	}
 	if cfg.SimNet {

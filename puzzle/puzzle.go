@@ -228,7 +228,7 @@ func decryptPuzzle(pk *PuzzleKey, c *big.Int) (*big.Int, error) {
 // promise that puzzle p opens up to this solution.
 func NewSolutionPromise(pk *PuzzleKey, p []byte) ([]byte, []byte, []byte, error) {
 	secret := make([]byte, ripemd160.Size)
-	if _, err := rand.Read(secret[:]); err != nil {
+	if _, err := rand.Read(secret); err != nil {
 		return nil, nil, nil, err
 	}
 
